@@ -1,0 +1,43 @@
+from pymodbus.client.sync import ModbusTcpClient
+from pymodbus.exceptions import ConnectionException
+
+# Configuration
+hostname = '10.165.72.71'
+port = 502
+
+# Create a Modbus TCP client
+client = ModbusTcpClient(hostname, port)
+
+try:
+    # Connect to the Modbus server
+    if client.connect():
+        print(f"Connected to {hostname}:{port}")
+
+        # Reading holding registers (example)
+        # Change the address and count according to the device's register map
+        address = 0  # Starting address
+        count = 10   # Number of registers to read
+
+        # Read holding registers
+        result = client.read_holding_registers(address, count)
+
+        if not result.isError():
+            # Successfully read registers
+            print("Registers:", result.registers)
+        else:
+            print("Failed to read registers:", result)
+
+        # Close the connection
+        client.close()
+    else:
+        print(f"Failed to connect to {hostname}:{port}")
+
+except ConnectionException as e:
+    print(f"Connection error: {e}")
+
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+finally:
+    if client.is_socket_open():
+        client.close()
